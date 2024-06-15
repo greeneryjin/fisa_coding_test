@@ -1,0 +1,8 @@
+-- 22년 10월에 작성된 게시글 제목, 게시글 ID, 댓글 ID, 댓글 작성자 ID, 댓글 내용, 댓글 작성일
+-- 댓글 작성일을 기준으로 오름차순 정렬, 댓글 작성일이 같으면 게시글 제목으로 기준 오름차순 
+SELECT b.TITLE, b.BOARD_ID, r.REPLY_ID, r.WRITER_ID, r.CONTENTS, 
+TO_CHAR(r.CREATED_DATE, 'YYYY-MM-DD') AS CREATED_DATE
+FROM USED_GOODS_BOARD b
+INNER JOIN USED_GOODS_REPLY r ON b.BOARD_ID = r.BOARD_ID
+WHERE TO_CHAR(b.CREATED_DATE, 'YYYYMM') = '202210'
+ORDER BY r.CREATED_DATE, b.TITLE ASC;
