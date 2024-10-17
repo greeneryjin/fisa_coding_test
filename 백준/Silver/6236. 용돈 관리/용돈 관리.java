@@ -1,53 +1,59 @@
-import java.util.Scanner;
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.StringTokenizer;
 
 public class Main {
-    public static void main(String[] args)  {
-        Scanner sc = new Scanner(System.in);
-        int n = sc.nextInt();
-        int c = sc.nextInt();
-        int[] arr = new int[n];
-        int max = 0;
 
-        for (int i = 0; i < n; i++) {
-            arr[i] = sc.nextInt();
-            max = Integer.max(max, arr[i]);
+    static BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+    static StringTokenizer st;
+    static StringBuilder sb = new StringBuilder();
+
+    public static void main(String[] args) throws IOException {
+        st = new StringTokenizer(br.readLine());
+        int n = Integer.parseInt(st.nextToken());
+        int k = Integer.parseInt(st.nextToken());
+        int[] arr = new int[n];
+
+        // 각 날에 사용할 금액 입력
+        int maxAmount = 0;
+        int totalAmount = 100000 * 10000;;
+
+        for(int i = 0; i < n; i++) {
+            st = new StringTokenizer(br.readLine());
+            arr[i] = Integer.parseInt(st.nextToken());
+            maxAmount = Math.max(maxAmount, arr[i]); // 하루에 사용할 금액 중 가장 큰 값
         }
 
-        //최소 인출 금액 하루 쓸 돈보다 무조건 커야함
-        int lt = max;
-        //최대 인출 금액( 100000명이 한 번에 10000을 뽑을 수 있다.)
-        int rt = 100000 * 10000;
-        int answer = 0;
+        // 이분 탐색 범위 설정
+        long left = maxAmount;  // 최소 인출 금액은 하루에 필요한 최대 금액 이상이어야 함
+        long right = totalAmount;  // 최대 인출 금액은 모든 금액의 합
+        long result = totalAmount; // 최소 인출 금액을 저장할 변수
 
-        while (lt <= rt) {
-            //평균 인출 금액
-            int mid = (lt + rt) / 2;
-            // 인출 횟수 - 첫 평균 값을 인출 최소값으로 설정함
-            int count = 1;
-            //인출한 돈과 뺀 돈이 남았을 경우 저장
-            int leftMoney = mid;
+        while (left <= right) {
+            long mid = (left + right) / 2; // 현재 중간값 (인출 금액 후보)
+            long currentAmount = 0;
+            int count = 1;  // 첫 번째 인출
 
-            //평균 인출 값이 정해지면 인출 횟수를 정함
-            for (int i = 0; i < n; i++) {
-                if (arr[i] <= leftMoney) {
-                    leftMoney -= arr[i];
-                } else {
-                    //(무조건 큰 값을 했기 때문에 쓸 돈이 인출 금액보다 작을 수는 없음)
-                    //다시 인출해서 횟수를 셈
-                    leftMoney = mid - arr[i];
+            for (int i = 0; i < arr.length; i++) {
+                if (currentAmount + arr[i] > mid) {
                     count++;
+                    currentAmount = arr[i];
+                } else {
+                    currentAmount += arr[i];
                 }
             }
-            //인출 금액이 너무 작아서 인출 횟수를 늘린 것.
-            if (count > c) {
-                lt = mid + 1;
-            }
-            //인출 금액이 너무 커서 인출 횟수가 기준값보다 작은 것.
-            else{
-                rt = mid - 1;
-                answer = rt;
+            if (count <= k) {
+                // 인출 횟수가 M번 이하로 가능하면 인출 금액을 줄여볼 수 있음
+                result = mid;
+                right = mid - 1;
+            } else {
+                // 인출 횟수가 M번보다 크다면 인출 금액을 늘려야 함
+                left = mid + 1;
             }
         }
-        System.out.println(answer + 1);
+        System.out.println(result);
     }
 }
